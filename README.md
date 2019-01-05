@@ -1,14 +1,13 @@
 # FQS: Fast Quartic solver
 
-Python function for computing roots of a quartic (4th order polynomial).
+A fast python function for computing roots of a quartic equation (4th order polynomial) and a cubic equation (3rd order polynomial).
 
 
 # Features
 
- * Computes both real and complex roots of one or many quartics
- * If roots are all distinct and real a fast closed-form analytical solution is used
- * If some of the roots are complex or there are multiple roots, a numerical eigensolver is used
- * Function does not use `for` loops, therefore it is much faster when a large set of quartic roots are needed.
+ * The function is optimized for computing a large set of roots of 3rd and 4th order polynomials (quartic or cubic equations).
+ * A closed-form analytical solutions of Ferrari and Cardano are used, which are several times faster than the integral `numpy.roots` or `numpy.linalg.eigvals` functions.
+ * The algorithm is based on `numpy` to avoid using `for` loops when multiple polynomials are evaluated.
  
  
  # Requirements
@@ -19,20 +18,21 @@ Python function for computing roots of a quartic (4th order polynomial).
  
  # Usage
  
- See [`test_quartic_solver.py`](test_quartic_solver.py) for examples.
- 
- Bascially, the function can be used as follows:
+See [test_cubic_roots.py](test_cubic_roots.py) and [test_quartic_roots.py](test_quartic_roots.py) for example on the usage and performance in comparison to `numpy.roots` and `numpy.linalg.eigvals`.
+
+For quartic roots, the function can be used as follows:
  
  ```
  import fqs
- roots, real_idx = fqs.quartic_roots(p)
+ roots = fqs.quartic_roots(p)
+ 
  ```
  
  or
  
   ```
  from fqs import quartic_roots
- roots, real_idx = quartic_roots(p)
+ roots = quartic_roots(p)
  ```
 
  where `p` is an array of polynomial coefficients of the form:
@@ -40,25 +40,50 @@ Python function for computing roots of a quartic (4th order polynomial).
  p[0]*x^4 + p[1]*x^3 + p[2]*x^2 + p[3]*x + p[4] = 0
  ```
  
- `roots` is an array of roots,  
- `real_idx` is a boolean array, where `True` denotes indices of all real roots.
+ and `roots` is an array of resulting four roots.  
  
- Stacked array of coefficients are allowed, which means that `p` may have size (5,), (5, _M_) or (_M_, 5), where _M_ > 0 is the number of polynomials. Consequently, `roots` will have size (_M_, 4).
+ Stacked array of coefficients are allowed, which means that `p` may have size (5,) or (_M_, 5), where _M_ > 0 is the number of polynomials. Consequently, `roots` will have size (_M_, 4).
+
+ 
+ For cubic roots, the function can be used as follows:
+ 
+ ```
+ import fqs
+ roots = fqs.cubic_roots(p)
+ 
+ ```
+ 
+ or
+ 
+  ```
+ from fqs import cubic_roots
+ roots = cubic_roots(p)
+ ```
+
+ where `p` is an array of polynomial coefficients of the form:
+ ```
+p[0]*x^3 + p[1]*x^2 + p[2]*x + p[3] = 0
+ ```
+ 
+ `roots` is an array of resulting three roots.  
+ 
+ Stacked array of coefficients are allowed, which means that `p` may have size (4,) or (_M_, 4), where _M_ > 0 is the number of polynomials. Consequently, `roots` will have size (_M_, 3).
+
 
  
  # FAQ
 
-
  > Why not simply use `numpy.roots` for all polynomials?
  
- If only one set of quartic roots are needed, then, by all means, use it. However, `numpy.roots` alows only rank-1 arrays, which means that if a large set of roots are needed, `numpy.roots` must be placed inside a `for` loop, which significantly slows down the computation (several orders of magnitude in comparison to `fqs`).
+ If roots of only one polynomial (cubic or quartic) are needed, then, by all means, use it. However, `numpy.roots` alows only rank-1 arrays, which means that if roots of a large set of polynomials are needed, `numpy.roots` must be placed inside a `for` loop, which significantly slows down the computation (for example, `fqs` solvers are ~130-150 times faster than `np.roots` inside a `for` loop, when 10000 polynomials are evaluated).
  
  > Why not use `numpy.linalg.eigvals` for all polynomials?
  
- The analytical closed-form solution is about 20-30 times faster than the numerical eigensolver when all four roots are distinct and real.
+ True, `numpy.linalg.eigvals` can evaluate roots of multiple polynomials; however, `fqs` solvers are based on analytical solutions, which are about 5-8 times faster than the numerical eigensolver.
+ 
  
  # License
-
+ 
 [MIT license](LICENSE)
 
 
