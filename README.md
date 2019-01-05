@@ -1,11 +1,11 @@
-# FQS: Fast Quartic solver
+# FQS: Fast Quartic and Cubic solver
 
 A fast python function for computing roots of a quartic equation (4th order polynomial) and a cubic equation (3rd order polynomial).
 
 
 # Features
 
- * The function is optimized for computing a large set of roots of 3rd and 4th order polynomials (quartic or cubic equations).
+ * The function is optimized for computing a large set of roots of 3rd and 4th order polynomials (cubic and quartic equations).
  * A closed-form analytical solutions of Ferrari and Cardano are used, which are several times faster than the integral `numpy.roots` or `numpy.linalg.eigvals` functions.
  * The algorithm is based on `numpy` to avoid using `for` loops when multiple polynomials are evaluated.
  
@@ -75,11 +75,11 @@ p[0]*x^3 + p[1]*x^2 + p[2]*x + p[3] = 0
 
  > Why not simply use `numpy.roots` for all polynomials?
  
- If roots of only one polynomial (cubic or quartic) are needed, then, by all means, use it. However, `numpy.roots` alows only rank-1 arrays, which means that if roots of a large set of polynomials are needed, `numpy.roots` must be placed inside a `for` loop, which significantly slows down the computation (for example, `fqs` solvers are ~130-150 times faster than `np.roots` inside a `for` loop, when 10000 polynomials are evaluated).
+ If roots of only one polynomial (cubic or quartic) are needed, then, by all means, use it. However, `numpy.roots` alows only rank-1 arrays, which means that if roots of a large set of polynomials are needed, `numpy.roots` must be placed inside a `for` loop, which significantly slows down the computation (for example, `fqs` solvers are ~130-150 times faster than `numpy.roots` inside a `for` loop, when 10 000 polynomials are evaluated).
  
  > Why not use `numpy.linalg.eigvals` for all polynomials?
  
- True, `numpy.linalg.eigvals` can evaluate roots of multiple polynomials; however, `fqs` solvers are based on analytical solutions, which are about 5-8 times faster than the numerical eigensolver.
+ True, `numpy.linalg.eigvals` can evaluate roots of multiple polynomials via companion matrix; however, `fqs` solvers are based on analytical solutions, which are about 5-8 times faster than the numerical eigensolver.
  
  
  # License
