@@ -32,35 +32,50 @@ def eig_roots(p):
 
 
 # --------------------------------------------------------------------------- #
-# Tests
-#
-# Test speed of quartic solver compared to np.roots and np.linalg.eigvals
+# Test speed of fqs quartic solver compared to np.roots and np.linalg.eigvals
 # --------------------------------------------------------------------------- #
 
 # Number of samples (sets of randomly generated quartic coefficients)
 N = 10000
+
+
+# Generate polynomial coefficients
 range_coeff = 100
 p = np.random.rand(N, 5)*(range_coeff) - range_coeff/2
 
-start = timeit.default_timer()
-roots1 = numpy_roots(p)
-stop = timeit.default_timer()
-time1 = stop - start
-print('np.roots: {:.2f} ms'.format(time1*1000))
+# number of runs
+runs = 5
 
-start = timeit.default_timer()
-roots2 = eig_roots(p)
-stop = timeit.default_timer()
-time2 = stop - start
-print('np.linalg.eigvals: {:.2f} ms'.format(time2*1000))
+best_time = 100
+for i in range(runs):
+    start = timeit.default_timer()
+    roots1 = numpy_roots(p)
+    stop = timeit.default_timer()
+    time = stop - start
+    best_time = min(best_time, time)
+print('np.roots: {:.2f} ms (best of {} runs)'.format(best_time*1000, runs))
+
+best_time = 100
+for i in range(runs):
+    start = timeit.default_timer()
+    roots2 = eig_roots(p)
+    stop = timeit.default_timer()
+    time = stop - start
+    best_time = min(best_time, time)
+print('np.linalg.eigvals: {:.2f} ms (best of {} runs)'.format(best_time*1000,
+      runs))
 print('max err: ', (abs(np.sort(roots2, axis=1)
                     - (np.sort(roots1, axis=1)))).max())
 
-start = timeit.default_timer()
-roots3 = fqs.quartic_roots(p)
-stop = timeit.default_timer()
-time3 = stop - start
-print('fqs.quartic_roots: {:.2f} ms'.format(time3*1000))
+best_time = 100
+for i in range(runs):
+    start = timeit.default_timer()
+    roots3 = fqs.quartic_roots(p)
+    stop = timeit.default_timer()
+    time = stop - start
+    best_time = min(best_time, time)
+print('fqs.quartic_roots: {:.2f} ms (best of {} runs)'.format(best_time*1000,
+      runs))
 print('max err: ', (abs(np.sort(roots3, axis=1)
                     - (np.sort(roots1, axis=1)))).max())
 # --------------------------------------------------------------------------- #
