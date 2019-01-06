@@ -246,7 +246,7 @@ def cubic_roots(p):
     if p.ndim < 2:
         p = p[np.newaxis, :]
 
-    # Check if five coefficients are given
+    # Check if four coefficients are given
     if p.shape[1] != 4:
         raise ValueError('Expected 3rd order polynomial with 4 '
                          'coefficients, got {:d}.'.format(p.shape[1]))
@@ -318,13 +318,3 @@ def quartic_roots(p):
     roots = np.array([r0, r1, r2, r3]).T
 
     return roots
-
-
-# Number of samples (sets of randomly generated quartic coefficients)
-N = 10000
-
-
-# Generate polynomial coefficients
-range_coeff = 100
-p = np.random.rand(N, 5)*(range_coeff) - range_coeff/2
-roots3 = quartic_roots(p)
