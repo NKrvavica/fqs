@@ -29,8 +29,8 @@ def solve_quadratic(a0, b0, c0):
     a, b = b0 / a0, c0 / a0
 
     # Some repating variables
-    a0 = -0.5 * a
-    delta = a0**2 - b
+    a0 = -0.5*a
+    delta = a0*a0 - b
     sqrt_delta = np.sqrt(delta)
 
     # Roots
@@ -65,18 +65,18 @@ def solve_cubic(a0, b0, c0, d0, all_roots=True):
 
     # Reduce the cubic equation to to form:
     # x^3 + a*x^2 + bx + c = 0'''
-    a, b, c = b0 / a0, c0 / a0, d0/a0
+    a, b, c = b0 / a0, c0 / a0, d0 / a0
 
     # Some repeating constants and variables
     third = 1./3.
     a13 = a*third
-    a2 = a13**2
+    a2 = a13*a13
     sqr3 = math.sqrt(3)
 
     # Additional intermediate variables
     f = third*b - a2
     g = a13 * (2*a2 - b) + c
-    h = 0.25*g**2 + f*f*f
+    h = 0.25*g*g + f*f*f
 
     # Masks for different combinations of roots
     m1 = (f == 0) & (g == 0) & (h == 0)     # roots are real and equal
@@ -172,21 +172,21 @@ def solve_quartic(a0, b0, c0, d0, e0):
 
     # Some repeating variables
     a0 = 0.25*a
-    a02 = a0**2
+    a02 = a0*a0
 
     # Coefficients of subsidiary cubic euqtion
     p = 3*a02 - 0.5*b
     q = a*a02 - b*a0 + 0.5*c
-    r = 3*a02**2 - b*a02 + c*a0 - d
+    r = 3*a02*a02 - b*a02 + c*a0 - d
 
     # One root of the cubic equation
-    z0 = solve_cubic(1, p, r, p*r - 0.5*q**2, all_roots=False)
+    z0 = solve_cubic(1, p, r, p*r - 0.5*q*q, all_roots=False)
 
     # Additional variables
     s = np.sqrt(2*p + 2*z0.real + 0j)
     t = np.zeros_like(s)
     mask = (s == 0)
-    t[mask] = z0[mask]**2 + r[mask]
+    t[mask] = z0[mask]*z0[mask] + r[mask]
     t[~mask] = -q[~mask] / s[~mask]
 
     # Compute roots by quadratic equations
@@ -318,3 +318,13 @@ def quartic_roots(p):
     roots = np.array([r0, r1, r2, r3]).T
 
     return roots
+
+
+# Number of samples (sets of randomly generated quartic coefficients)
+N = 10000
+
+
+# Generate polynomial coefficients
+range_coeff = 100
+p = np.random.rand(N, 5)*(range_coeff) - range_coeff/2
+roots3 = quartic_roots(p)
