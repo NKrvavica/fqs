@@ -11,6 +11,8 @@ A fast python function for computing roots of a quartic equation (4th order poly
  * For a large number of polynomials (>100), the algorithm is based on `numpy` to avoid using slower list comprehensions.
  * The solver is two order of magnitude faster than the integral `numpy.roots` inside a list comprehension, and several times faster than the `numpy.linalg.eigvals` function.
  
+ A detailed documentation with cpu time analyses is available [here](On_computing_roots.md).
+ 
  
  # Requirements
  
@@ -65,7 +67,7 @@ p[0]*x^3 + p[1]*x^2 + p[2]*x + p[3] = 0
  > Why not simply use `numpy.roots` or `numpy.linalg.eigvals` for all polynomials?
  
 For single polynomial, both quartic and cubic solvers are one order of magnitude faster than `numpy.roots` and `numpy.linalg.eigvals`. 
-For large number of polynomials (>1_0000), both quartic and cubic solver are one order of mangitude faster than `numpy.linalg.eigvals and two order of magnitude faster than `numpy.roots` inside a list comprehension.
+For large number of polynomials (>1_0000), both quartic and cubic solver are one order of magnitude faster than `numpy.linalg.eigvals` and two order of magnitude faster than `numpy.roots` inside a list comprehension.
  
  
  # License

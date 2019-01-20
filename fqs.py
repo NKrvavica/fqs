@@ -11,7 +11,7 @@ from numba import jit
 
 
 @jit(nopython=True)
-def solve_single_quadratic(a0, b0, c0):
+def single_quadratic(a0, b0, c0):
     ''' Analytical solver for a single quadratic equation
     (2nd order polynomial).
 
@@ -27,8 +27,8 @@ def solve_single_quadratic(a0, b0, c0):
     r1, r2: tuple
         Output data is a tuple of two roots of a given polynomial.
     '''
-    # Reduce the quadratic equation to to form:
-    # x^2 + ax + b = 0'''
+    ''' Reduce the quadratic equation to to form:
+        x^2 + ax + b = 0'''
     a, b = b0 / a0, c0 / a0
 
     # Some repating variables
@@ -44,7 +44,7 @@ def solve_single_quadratic(a0, b0, c0):
 
 
 @jit(nopython=True)
-def solve_single_cubic(a0, b0, c0, d0):
+def single_cubic(a0, b0, c0, d0):
     ''' Analytical closed-form solver for a single cubic equation
     (3rd order polynomial), gives all three roots.
 
@@ -61,8 +61,8 @@ def solve_single_cubic(a0, b0, c0, d0):
         Output data is a tuple of three roots of a given polynomial.
     '''
 
-    # Reduce the cubic equation to to form:
-    # x^3 + a*x^2 + bx + c = 0'''
+    ''' Reduce the cubic equation to to form:
+        x^3 + a*x^2 + b*x + c = 0 '''
     a, b, c = b0 / a0, c0 / a0, d0 / a0
 
     # Some repeating constants and variables
@@ -77,8 +77,7 @@ def solve_single_cubic(a0, b0, c0, d0):
     h = 0.25*g*g + f*f*f
 
     def cubic_root(x):
-        ''' Compute cubic root of a number while maintaining its sign
-        '''
+        ''' Compute cubic root of a number while maintaining its sign'''
         if x.real >= 0:
             return x**third
         else:
@@ -111,7 +110,7 @@ def solve_single_cubic(a0, b0, c0, d0):
 
 
 @jit(nopython=True)
-def solve_single_cubic_one(a0, b0, c0, d0):
+def single_cubic_one(a0, b0, c0, d0):
     ''' Analytical closed-form solver for a single cubic equation
     (3rd order polynomial), gives only one real root.
 
@@ -128,8 +127,8 @@ def solve_single_cubic_one(a0, b0, c0, d0):
         Output data is a real root of a given polynomial.
     '''
 
-    # Reduce the cubic equation to to form:
-    # x^3 + a*x^2 + bx + c = 0'''
+    ''' Reduce the cubic equation to to form:
+        x^3 + a*x^2 + bx + c = 0'''
     a, b, c = b0 / a0, c0 / a0, d0 / a0
 
     # Some repeating constants and variables
@@ -168,17 +167,17 @@ def solve_single_cubic_one(a0, b0, c0, d0):
 
 
 @jit(nopython=True)
-def solve_single_quartic(a0, b0, c0, d0, e0):
+def single_quartic(a0, b0, c0, d0, e0):
     ''' Analytical closed-form solver for a single quartic equation
-    (4th order polynomial). Calls `solve_single_cubic_one` and
-    `solve_single quadratic`.
+    (4th order polynomial). Calls `single_cubic_one` and
+    `single quadratic`.
 
     Parameters
     ----------
     a0, b0, c0, d0, e0: array_like
         Input data are coefficients of the Quartic polynomial::
 
-            a0*x^4 + b0*x^3 + c0*x^2 + d0*x + e0 = 0
+        a0*x^4 + b0*x^3 + c0*x^2 + d0*x + e0 = 0
 
     Returns
     -------
@@ -186,8 +185,8 @@ def solve_single_quartic(a0, b0, c0, d0, e0):
         Output data is a tuple of four roots of given polynomial.
     '''
 
-    # Reduce the quartic equation to to form:
-    # x^4 ax^3 + bx^2 + cx + d = 0'''
+    ''' Reduce the quartic equation to to form:
+        x^4 + a*x^3 + b*x^2 + c*x + d = 0'''
     a, b, c, d = b0/a0, c0/a0, d0/a0, e0/a0
 
     # Some repeating variables
@@ -200,7 +199,7 @@ def solve_single_quartic(a0, b0, c0, d0, e0):
     r = 3*a02*a02 - b*a02 + c*a0 - d
 
     # One root of the cubic equation
-    z0 = solve_single_cubic_one(1, p, r, p*r - 0.5*q*q)
+    z0 = single_cubic_one(1, p, r, p*r - 0.5*q*q)
 
     # Additional variables
     s = cmath.sqrt(2*p + 2*z0.real + 0j)
@@ -210,13 +209,13 @@ def solve_single_quartic(a0, b0, c0, d0, e0):
         t = -q / s
 
     # Compute roots by quadratic equations
-    r0, r1 = solve_single_quadratic(1, s, z0 + t)
-    r2, r3 = solve_single_quadratic(1, -s, z0 - t)
+    r0, r1 = single_quadratic(1, s, z0 + t)
+    r2, r3 = single_quadratic(1, -s, z0 - t)
 
     return r0 - a0, r1 - a0, r2 - a0, r3 - a0
 
 
-def solve_multi_quadratic(a0, b0, c0):
+def multi_quadratic(a0, b0, c0):
     ''' Analytical solver for multiple quadratic equations
     (2nd order polynomial), based on `numpy` functions.
 
@@ -232,14 +231,14 @@ def solve_multi_quadratic(a0, b0, c0):
     r1, r2: ndarray
         Output data is an array of two roots of given polynomials.
     '''
-    # Reduce the quadratic equation to to form:
-    # x^2 + ax + b = 0'''
+    ''' Reduce the quadratic equation to to form:
+        x^2 + ax + b = 0'''
     a, b = b0 / a0, c0 / a0
 
     # Some repating variables
     a0 = -0.5*a
     delta = a0*a0 - b
-    sqrt_delta = np.sqrt(delta)
+    sqrt_delta = np.sqrt(delta + 0j)
 
     # Roots
     r1 = a0 - sqrt_delta
@@ -248,7 +247,7 @@ def solve_multi_quadratic(a0, b0, c0):
     return r1, r2
 
 
-def solve_multi_cubic(a0, b0, c0, d0, all_roots=True):
+def multi_cubic(a0, b0, c0, d0, all_roots=True):
     ''' Analytical closed-form solver for multiple cubic equations
     (3rd order polynomial), based on `numpy` functions.
 
@@ -271,8 +270,8 @@ def solve_multi_cubic(a0, b0, c0, d0, all_roots=True):
         if `all_roots=False`.
     '''
 
-    # Reduce the cubic equation to to form:
-    # x^3 + a*x^2 + bx + c = 0'''
+    ''' Reduce the cubic equation to to form:
+        x^3 + a*x^2 + bx + c = 0'''
     a, b, c = b0 / a0, c0 / a0, d0 / a0
 
     # Some repeating constants and variables
@@ -356,10 +355,10 @@ def solve_multi_cubic(a0, b0, c0, d0, all_roots=True):
     return roots
 
 
-def solve_multi_quartic(a0, b0, c0, d0, e0):
+def multi_quartic(a0, b0, c0, d0, e0):
     ''' Analytical closed-form solver for multiple quartic equations
     (4th order polynomial), based on `numpy` functions. Calls
-    `solve_multi_cubic` and `solve_multi_quadratic`.
+    `multi_cubic` and `multi_quadratic`.
 
     Parameters
     ----------
@@ -374,8 +373,8 @@ def solve_multi_quartic(a0, b0, c0, d0, e0):
         Output data is an array of four roots of given polynomials.
     '''
 
-    # Reduce the quartic equation to to form:
-    # x^4 ax^3 + bx^2 + cx + d = 0'''
+    ''' Reduce the quartic equation to to form:
+        x^4 ax^3 + bx^2 + cx + d = 0'''
     a, b, c, d = b0/a0, c0/a0, d0/a0, e0/a0
 
     # Some repeating variables
@@ -388,7 +387,7 @@ def solve_multi_quartic(a0, b0, c0, d0, e0):
     r = 3*a02*a02 - b*a02 + c*a0 - d
 
     # One root of the cubic equation
-    z0 = solve_multi_cubic(1, p, r, p*r - 0.5*q*q, all_roots=False)
+    z0 = multi_cubic(1, p, r, p*r - 0.5*q*q, all_roots=False)
 
     # Additional variables
     s = np.sqrt(2*p + 2*z0.real + 0j)
@@ -398,8 +397,8 @@ def solve_multi_quartic(a0, b0, c0, d0, e0):
     t[~mask] = -q[~mask] / s[~mask]
 
     # Compute roots by quadratic equations
-    r0, r1 = solve_multi_quadratic(1, s, z0 + t) - a0
-    r2, r3 = solve_multi_quadratic(1, -s, z0 - t) - a0
+    r0, r1 = multi_quadratic(1, s, z0 + t) - a0
+    r2, r3 = multi_quadratic(1, -s, z0 - t) - a0
 
     return r0, r1, r2, r3
 
@@ -409,9 +408,9 @@ def cubic_roots(p):
     A caller function for a fast cubic root solver (3rd order polynomial).
 
     If a single cubic equation or a set of fewer than 100 equations is
-    given as an input, this function will call `solve_single_cubic` inside
+    given as an input, this function will call `single_cubic` inside
     a list comprehension. Otherwise (if a more than 100 equtions is given), it
-    will call `solve_multi_cubic` which is based on `numpy` functions.
+    will call `multi_cubic` which is based on `numpy` functions.
     Both equations are based on a closed-form analytical solutions by Cardano.
 
     Parameters
@@ -464,10 +463,10 @@ def cubic_roots(p):
                          'coefficients, got {:d}.'.format(p.shape[1]))
 
     if p.shape[0] < 100:
-        roots = [solve_single_cubic(*pi) for pi in p]
+        roots = [single_cubic(*pi) for pi in p]
         return np.array(roots)
     else:
-        roots = solve_multi_cubic(*p.T)
+        roots = multi_cubic(*p.T)
         return np.array(roots).T
 
 
@@ -476,9 +475,9 @@ def quartic_roots(p):
     A caller function for a fast quartic root solver (4th order polynomial).
 
     If a single quartic equation or a set of fewer than 100 equations is
-    given as an input, this function will call `solve_single_quartic` inside
+    given as an input, this function will call `single_quartic` inside
     a list comprehension. Otherwise (if a more than 100 equtions is given), it
-    will call `solve_multi_quartic` which is based on `numpy` functions.
+    will call `multi_quartic` which is based on `numpy` functions.
     Both equations are based on a closed-form analytical solutions by Ferrari
     and Cardano.
 
@@ -533,8 +532,8 @@ def quartic_roots(p):
                          'coefficients, got {:d}.'.format(p.shape[1]))
 
     if p.shape[0] < 100:
-        roots = [solve_single_quartic(*pi) for pi in p]
+        roots = [single_quartic(*pi) for pi in p]
         return np.array(roots)
     else:
-        roots = solve_multi_quartic(*p.T)
+        roots = multi_quartic(*p.T)
         return np.array(roots).T
