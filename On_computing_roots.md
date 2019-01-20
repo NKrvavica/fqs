@@ -8,21 +8,21 @@ _by Nino Krvavica ([nino.krvavica@uniri.hr](nino.krvavica@uniri.hr))_
 
 **Abstract**
 
-This document examines various ways to compute roots of cubic (3rd order polynomial) and quartic (4th order polynomial) equations in Python. First, two numerical algorithms, available from Numpy (`roots` and `linalg.eigvals`), were analyzed. Then, an optimized closed-form analytical solutions to cubic and quartic equations were implemented and examined. Finally, the analytical solutions were vectorized by using `numpy` arrays in order to avoid slow python iterations when multiple polynomials are solved. All these functions were evaluated by comparing their computational speeds. Analytical cubic and quartic solvers were one order of magnitude faster than both numerical Numpy functions for a single polynomial. When a large set of polynomials were given as input, the vectorized analytical solver outperformed `linalg.eigvals` by one order of magnitude, and `roots` (inside a list comprehension) by two orders of magnitude.
+This document examines various ways to compute roots of cubic (3rd order polynomial) and quartic (4th order polynomial) equations in Python. First, two numerical algorithms, available from Numpy package (`roots` and `linalg.eigvals`), were analyzed. Then, an optimized closed-form analytical solutions to cubic and quartic equations were implemented and examined. Finally, the analytical solutions were vectorized by using `numpy` arrays in order to avoid slow python iterations when multiple polynomials are solved. All these functions were evaluated by comparing their computational speeds. Analytical cubic and quartic solvers were one order of magnitude faster than both numerical Numpy functions for a single polynomial. When a large set of polynomials were given as input, the vectorized analytical solver outperformed the numerical Numpy functions by one and two orders of magnitude, respectively. 
 
-**Keywords:** _cubic_, _quartic_, _python_, _numpy_, _closed-form_, _polynomial roots_, _eigenvalues_
+**Keywords:** _cubic_, _quartic_, _python_, _numpy_, _closed-form_, _polynomial roots_, _eigenvalues_, _fqs_
 
 
 
 ## Introduction
 
-In scientific computing we are sometimes faced with solving roots of a [cubic](https://en.wikipedia.org/wiki/Cubic_function) (3rd order polynomial) or [quartic](https://en.wikipedia.org/wiki/Quartic_function) equation (4th order polynomial) to get crucial information about the characteristics of some physical process. These issues are regularly encountered when analyzing dynamic systems described by three or four differential equations. One such example is a two-layer [Shallow Water Flow](https://en.wikipedia.org/wiki/Shallow_water_equations) (SWE), which is defined by four [Partial Differential Equations](https://en.wikipedia.org/wiki/Partial_differential_equation) (PDE). In two-layer SWE, the [eigenvalues](https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors) of the 4x4 flux matrix describe the speed of internal and external wave propagation. And, the eigenvalues of a 4x4 matrix correspond to roots of a characteristic 4th order polynomial. Similarly, SWE coupled with sediment transport are defined by three PDEs. In this case,  the eigenvalues of a 3x3 matrix correspond to roots of a characteristic 3rd order polynomial. There are many more examples where such computation is required.
+In scientific computing we are sometimes faced with solving roots of a [cubic](https://en.wikipedia.org/wiki/Cubic_function) (3rd order polynomial) or [quartic](https://en.wikipedia.org/wiki/Quartic_function) equation (4th order polynomial) to get crucial information about the characteristics of some physical process or to develop an appropriate numerical scheme. These issues are regularly encountered when analyzing coupled dynamic systems described by three or four differential equations. One such example is a two-layer [Shallow Water Flow](https://en.wikipedia.org/wiki/Shallow_water_equations) (SWE), which is defined by four [Partial Differential Equations](https://en.wikipedia.org/wiki/Partial_differential_equation) (PDE). In two-layer SWE, the [eigenvalues](https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors) of the 4x4 flux matrix describe the speed of internal and external wave propagation. And, the eigenvalues correspond to roots of a characteristic 4th order polynomial. Similarly, SWE coupled with sediment transport are defined by three PDEs. In this case,  the eigenvalues of a 3x3 matrix correspond to roots of a characteristic 3rd order polynomial. There are many more examples where such computation is required.
 
-Roots of cubic and quartic equations can be computed by using [numerical methods](https://en.wikipedia.org/wiki/Numerical_method) or analytical expressions (so called [closed-form solutions](https://en.wikipedia.org/wiki/Closed-form_expression)). Numerical methods are based on specific algorithms and provide only approximations to roots. [Root-finding algorithms](https://en.wikipedia.org/wiki/Root-finding_algorithm) (such as Newton's, secant, Brent's method, etc.) are appropriate for any continuous function, they use iterations but do not guarantee that all roots will be found. However, a different class of numerical methods is available for polynomials, based on finding [eigenvalues](https://en.wikipedia.org/wiki/Eigenvalue_algorithm) of the companion matrix of a polynomial. 
+Roots of cubic and quartic equations can be computed using [numerical methods](https://en.wikipedia.org/wiki/Numerical_method) or analytical expressions (so called [closed-form solutions](https://en.wikipedia.org/wiki/Closed-form_expression)). Numerical methods are based on specific algorithms and provide only approximations to roots. [Root-finding algorithms](https://en.wikipedia.org/wiki/Root-finding_algorithm) (such as Newton's, secant, Brent's method, etc.) are appropriate for any continuous function, they use iterations but do not guarantee that all roots will be found. However, a different class of numerical methods is available (and recommended) for polynomials, based on finding [eigenvalues](https://en.wikipedia.org/wiki/Eigenvalue_algorithm) of the companion matrix of a polynomial. 
 
 In Python, there are several ways to numerically compute roots of any polynomial; however, only two functions are generally recommended and used. First is a [Numpy](http://www.numpy.org/) function called `roots` which directly computes all roots of a general polynomial, and the second is also a [Numpy](http://www.numpy.org/) function from `linalg` module called `eigvals`, which computes eigenvalues of a companion matrix constructed from a given (characteristic) polynomial.
 
-On the other hand, analytical [closed-form solutions exist for all polynomials of degree lower than five](https://en.wikipedia.org/wiki/Abel%E2%80%93Ruffini_theorem), that is, for quadratic, cubic, and quartic equations. Although, the expressions for cubic and quadratic roots are longer and more complicated than for a quadratic equations, they can still be easily implemented in some computational algorithm. The closed-form solution for roots of cubic equations is based on Cardano's expressions given [here](https://en.wikipedia.org/wiki/Cubic_function) and [here](http://www.1728.org/cubic2.htm). Similarly, solution to the roots for quartic equations is based on Ferrari's expressions given [here](https://en.wikipedia.org/wiki/Quartic) and [here.](http://www.1728.org/quartic2.htm) A fast and optimized algorithm - [FQS](https://github.com/NKrvavica/fqs) - that uses analytical solutions to cubic and quartic equation was implemented in Python by the author and is publicly available [here](https://github.com/NKrvavica/fqs).
+On the other hand, analytical [closed-form solutions exist for all polynomials of degree lower than five](https://en.wikipedia.org/wiki/Abel%E2%80%93Ruffini_theorem), that is, for quadratic, cubic, and quartic equations. Although, the expressions for cubic and quadratic roots are longer and more complicated than for a quadratic equations, they can still be easily implemented in some computational algorithm. The closed-form solution for roots of cubic equations is based on Cardano's expressions given [here](https://en.wikipedia.org/wiki/Cubic_function) and [here](http://www.1728.org/cubic2.htm). Similarly, solution to the roots for quartic equations is based on Ferrari's expressions given [here](https://en.wikipedia.org/wiki/Quartic) and [here.](http://www.1728.org/quartic2.htm) A fast and optimized algorithm - [FQS](https://github.com/NKrvavica/fqs) - that uses analytical solutions to cubic and quartic equation was implemented in Python and made publicly available [here](https://github.com/NKrvavica/fqs).
 
 All computational algorithms were implemented in Python 3.7 with Numpy 1.15, and tests were done on Windows 64-bit machine, i5-2500 CPU @ 3.30 GHz.
 
@@ -63,7 +63,6 @@ The respective results are:
 			-1.1475662 +0.j        ]))
 
 and
-	  
 	>>> p_quartic
 	array([0.30022249, 0.31473263, 0.00791689, 0.06335546, 0.73838408])
 	>>> quartic_roots
@@ -134,13 +133,14 @@ and then construct the companion matrix:
 The function to compute roots from eigenvalues of a single companion matrix is implemented for cubic equation as follows:
 
 	def eig_cubic_roots(p):
+		
 		# Coefficients of quartic equation
 		a, b, c = p[:, 1]/p[:, 0], p[:, 2]/p[:, 0], p[:, 3]/p[:, 0]
 		
 		# Construct the companion matrix
-		A = np.zeros((len(a), 3, 3))
-		A[:, 1:, :2] = np.eye(2)
-		A[:, :, 2] = -np.array([c, b, a]).T
+		A = numpy.zeros((len(a), 3, 3))
+		A[:, 1:, :2] = numpy.eye(2)
+		A[:, :, 2] = -numpy.array([c, b, a]).T
 		
 		# Compute roots using eigenvalues
 		return numpy.linalg.eigvals(A)
@@ -155,9 +155,9 @@ Similarly, for quartic equation:
 					  p[:, 3]/p[:, 0], p[:, 4]/p[:, 0])
 		
 		# Construct the companion matrix
-		A = np.zeros((len(a), 4, 4))
-		A[:, 1:, :3] = np.eye(3)
-		A[:, :, 3] = -np.array([d, c, b, a]).T
+		A = numpy.zeros((len(a), 4, 4))
+		A[:, 1:, :3] = numpy.eye(3)
+		A[:, :, 3] = -numpy.array([d, c, b, a]).T
 		
 		# Compute roots using eigenvalues
 		return numpy.linalg.eigvals(A)
@@ -165,11 +165,11 @@ Similarly, for quartic equation:
 
 To compute roots of a single cubic equation, `eigvals` is implemented as follows:
 
-    cubic_roots = eig_cubic_roots(p_cubic)
+    cubic_roots = eig_cubic_roots(p_cubic[None, :])
 
  and for quartic roots:
 
-	quartic_roots = eig_quartic_roots(p_quartic)
+	quartic_roots = eig_quartic_roots(p_quartic[None, :])
 
 The results are:
 
@@ -178,16 +178,18 @@ The results are:
 			0.01557778-1.86945535j]])
 
 and
-	>>> quartic_roots
-	array([[ 0.67122379+0.87725993j,  0.67122379-0.87725993j,
-				-1.19538943+0.7660177j , -1.19538943-0.7660177j ]])
+```	>>> quartic_roots
+>>> quartic_roots
+array([[ 0.67122379+0.87725993j,  0.67122379-0.87725993j,
+		-1.19538943+0.7660177j , -1.19538943-0.7660177j ]])
+```
 
 Let's look at the computation times:
 
-	%timeit eig_cubic_roots(p_cubic)
+	%timeit eig_cubic_roots(p_cubic[None, :])
 	67 µs ± 316 ns per loop (mean ± std. dev. of 7 runs, 10000 loops each)
 	
-	%timeit eig_quartic_roots(p_quartic)
+	%timeit eig_quartic_roots(p_quartic[None, :])
 	69.3 µs ± 135 ns per loop (mean ± std. dev. of 7 runs, 10000 loops each)
 
 The computation times are slightly faster than `numpy.roots`.
@@ -208,7 +210,7 @@ The results indicate that `numpy.linalg.eigvals` is **one order of magnitude** f
 
 ### Implementation for a single polynomial
 
-Now, let's look at analytical implementations available by [FQS](https://github.com/NKrvavica/fqs) function. First, implementation of analytical solutions for single quadratic, cubic and quartic equation is presented. As stated in the introduction, these algorithms are based on closed-form solutions for cubic (given [here](https://en.wikipedia.org/wiki/Cubic_function) and [here](http://www.1728.org/cubic2.htm)) and quartic equations (given [here](https://en.wikipedia.org/wiki/Quartic) and [here](http://www.1728.org/quartic2.htm)). These equations were modified to avoid repeating computations, and to obtain an optimized algorithm.
+Now, let's look at analytical implementations available by [FQS](https://github.com/NKrvavica/fqs) function. First, implementation of analytical solutions for single quadratic, cubic and quartic equation is presented. As stated in the introduction, these algorithms are based on closed-form solutions for cubic (given [here](https://en.wikipedia.org/wiki/Cubic_function) and [here](http://www.1728.org/cubic2.htm)) and quartic equations (given [here](https://en.wikipedia.org/wiki/Quartic) and [here](http://www.1728.org/quartic2.htm)). These equations were modified to avoid repeating computations.
 
 Python function for roots of a quadratic equation is implemented as:
 
@@ -360,12 +362,12 @@ What about multiple polynomials?
 
 Analytical closed-form solver is about **twice as fast**  than `numpy.roots`. However, it is much slower (almost one order of magnitude) than the numerical solver from `numpy.linalg.eigvals`. This difference is mainly the consequence of using list comprehension.
 
-### Just-in-time complier from Numba
+### Just-in-time compiler from Numba
 
 Let's see if we can speed up the computation by using _just-in-time_ compiler from [Numba](http://numba.pydata.org/). We only need to import it and put a decorator before each function:
 
 ```
-from numy import jit
+from numba import jit
 
 @jit(nopython=True)
 def single_quadratic(a0, b0, c0):
@@ -411,7 +413,7 @@ However, notice that list comprehensions were used here for multiple inputs. Wha
 
 ### Vectorized analytical closed-form solvers
 
-To vectorize functions `single_quadratic`, `single_cubic`, and `single_quartic` using Numpy arrays we have to get rid of  all `if` clauses and replace them with Numpy masks. Also, we have to replace all mathematical functions from `math` and `cmath` with corresponding Numpy functions. This is implemented as follows.
+To vectorize functions `single_quadratic`, `single_cubic`, and `single_quartic` using Numpy arrays we have to get rid of all `if` clauses and replace them with Numpy masks. Also, we have to replace all mathematical functions from `math` and `cmath` with corresponding Numpy functions. This is implemented as follows.
 
 For quadratic equation:
 
@@ -562,7 +564,7 @@ Let's examine the computation time of vectorized analytical closed-form solvers 
 
 Clearly, vectorized version for a single polynomial is overkill, and results in slowest computation times.
 
-But how about multiple polynomials:
+But what about multiple polynomials:
 
 
 ```
@@ -579,26 +581,27 @@ The vectorized implementation of analytical solvers is an order of magnitude fas
 
 ## Summary (TL;DR)
 
-To summarize findings on computation speed of different ways to solve cubic and quartic equations in Python:
+Findings on computation speed of different ways to solve cubic and quartic equations in Python can be summarized as follows:
 
-* Two numerical root-solving algorithms were tested (`numpy.roots` and `numpy.linalg.eigvals`)
-* Two analytical closed-form solutions were also tested (`single_cubic/single_quartic` for a single polynomial and vectorized `mutli_cubic/multi_quartic`  for multiple polynomials). These functions are available through [FQS](https://github.com/NKrvavica/fqs).
-* If a single polynomial is being solved, `single_cubic/single_quartic` with Numba is the fastest algorithm. It is one order of magnitude faster than `numpy.roots`, `numpy.linalg.eigvals` and `multi_cubic/multi_quartic`. Using `@jit` from `numba` increases its speed by a factor of 4-13.
-* If multiple polynomials are being solved, and their number is less than ~100, `single_cubic/single_quartic` with Numba is still the fastest algorithm.
-* If more than 100 polynomials are being solved, use vectorized `multi_cubic/multi_quartic`, it is two orders of magnitude faster than `numpy.roots`, and one order of magnitude faster than `numpy.linalg.eigvals` and `single_cubic/single_quartic` with Numba.
+* Two numerical algorithms for finding polynomial roots are available out-of-box from Numpy package (`numpy.roots` and `numpy.linalg.eigvals`)
+* Analytical algorithms (closed-form solutions) for solving polynomial roots were implemented in Python (`single_cubic/single_quartic` for a single polynomial, and vectorized `multi_cubic/multi_quartic`  for multiple polynomials). These functions are available through [FQS](https://github.com/NKrvavica/fqs)
+* Both numerical algorithms have similar CPU times for a single polynomial, but for multiple polynomials `linalg.eigvals` becomes much faster (up to one order of magnitude)
+* Analytical algorithm `single_cubic/single_quartic` if the fastest when a single polynomial, or a set smaller then 100 polynomials should be solved
+* For `single_cubic/single_quartic` _just-in-time_ compiler from Numba gives a significant increase in the computational speed
+* Analytical algorithm `multi_cubic/multi_quartic` is the fastest when a set larger than 100 polynomials is given as input
 * A Python function containing `single_cubic` , `single_quartic`, `multi_cubic`, and `multi_quartic`, as well as a function than determines what solver should be used in a specific case, is available through [FQS](https://github.com/NKrvavica/fqs).
 
-The CPU times are summarized in the following two tables for cubic and quartic equation, respectively:
+The CPU times are summarized in the following two tables for different number of polynomials (Nr.) and separately for cubic and quartic equations:
 
-|     N | `roots` | `linalg.eigvals` | `single_cubic` | `single_cubic (@jit)` | `multi_cubic` |
-| ----: | ------- | ---------------- | -------------- | --------------------- | ------------- |
-|     1 | 76.5 µs | 67 µs            | 28.6 µs        | **6.34 µs**           | 174 µs        |
-|   100 | 8.19 ms | 0.54 ms          | 2.11 ms        | **0.27 ms**           | **0.24 ms**   |
-| 10000 | 786 ms  | 31.2 ms          | 236 ms         | 27.6 ms               | **3.14 ms**   |
+|   Nr. | `roots` | `linalg.eigvals` | `single_cubic` | `single_cubic(@jit)` | `multi_cubic` |
+| ----: | ------- | ---------------- | -------------- | -------------------- | ------------- |
+|     1 | 76.5 µs | 67 µs            | 28.6 µs        | **6.34 µs**          | 174 µs        |
+|   100 | 8.19 ms | 0.54 ms          | 2.11 ms        | **0.27 ms**          | **0.24 ms**   |
+| 10000 | 786 ms  | 31.2 ms          | 236 ms         | 27.6 ms              | **3.14 ms**   |
 
-|     N | `roots` | `linalg.eigvals` | `single_quartic` | `single_quartic (@jit)` | `multi_quartic` |
+|   Nr. | `roots` | `linalg.eigvals` | `single_quartic` | `single_quartic (@jit)` | `multi_quartic` |
 | ----: | ------- | ---------------- | ---------------- | ----------------------- | --------------- |
 |     1 | 80.1 µs | 69.3 µs          | 50.3 µs          | **5.8 µs**              | 233 µs          |
-|   100 | 8.22 ms | 0.59 ms          | 3.94 ms          | **0.34 ms**             | **0.34 ms**     |
+|   100 | 8.22 ms | 0.59 ms          | 3.94 ms          | **0.33 ms**             | **0.34 ms**     |
 | 10000 | 795 ms  | 48.3 ms          | 421 ms           | 30.8 ms                 | **5.46 ms**     |
 
