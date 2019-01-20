@@ -10,7 +10,7 @@ import numpy as np
 import fqs
 
 
-def eig_roots(p):
+def eig_quartic_roots(p):
     '''Finds quartic roots via numerical eigenvalue solver
     `npumpy.linalg.eigvals` from a 4x4 companion matrix'''
     a, b, c, d = (p[:, 1]/p[:, 0], p[:, 2]/p[:, 0],
@@ -29,71 +29,71 @@ def eig_roots(p):
 # --------------------------------------------------------------------------- #
 
 # Number of samples (sets of randomly generated quartic coefficients)
-N = 10_000
+N = 100
 
 # Generate polynomial coefficients
 range_coeff = 100
 p = np.random.rand(N, 5)*(range_coeff) - range_coeff/2
 
 # number of runs
-runs = 5
+runs = 10
 
-best_time = 100
+times = []
 for i in range(runs):
     start = timeit.default_timer()
     roots1 = [np.roots(pi) for pi in p]
     stop = timeit.default_timer()
     time = stop - start
-    best_time = min(best_time, time)
-print('np.roots: {:.3f} ms (best of {} runs)'
-      .format(best_time*1_000, runs))
+    times.append(time)
+print('np.roots: {:.4f} ms (best of {} runs)'
+      .format(np.array(times).mean()*1_000, runs))
 
-best_time = 100
+times = []
 for i in range(runs):
     start = timeit.default_timer()
-    roots2 = eig_roots(p)
+    roots2 = eig_quartic_roots(p)
     stop = timeit.default_timer()
     time = stop - start
-    best_time = min(best_time, time)
-print('np.linalg.eigvals: {:.3f} ms (best of {} runs)'
-      .format(best_time*1_000, runs))
+    times.append(time)
+print('np.linalg.eigvals: {:.4f} ms (average of {} runs)'
+      .format(np.array(times).mean()*1_000, runs))
 print('max err: {:.2e}'.format(abs(np.sort(roots2, axis=1)
                     - (np.sort(roots1, axis=1))).max()))
 
-best_time = 100
+times = []
 for i in range(runs):
     start = timeit.default_timer()
-    roots3 = [fqs.solve_single_quartic(*pi) for pi in p]
+    roots3 = [fqs.single_quartic(*pi) for pi in p]
     stop = timeit.default_timer()
     time = stop - start
-    best_time = min(best_time, time)
-print('fqs.solve_single_quartic: {:.3f} ms (best of {} runs)'
-      .format(best_time*1_000, runs))
+    times.append(time)
+print('fqs.single_quartic: {:.4f} ms (average of {} runs)'
+      .format(np.array(times).mean()*1_000, runs))
 print('max err: {:.2e}'.format(abs(np.sort(roots3, axis=1)
                     - (np.sort(roots1, axis=1))).max()))
 
-best_time = 100
+times = []
 for i in range(runs):
     start = timeit.default_timer()
-    roots = fqs.solve_multi_quartic(*p.T)
+    roots = fqs.multi_quartic(*p.T)
     roots4 = np.array(roots).T
     stop = timeit.default_timer()
     time = stop - start
-    best_time = min(best_time, time)
-print('fqs.solve_multi_quartic: {:.3f} ms (best of {} runs)'
-      .format(best_time*1_000, runs))
+    times.append(time)
+print('fqs.multi_quartic: {:.4f} ms (average of {} runs)'
+      .format(np.array(times).mean()*1_000, runs))
 print('max err: {:.2e}'.format(abs(np.sort(roots4, axis=1)
                     - (np.sort(roots1, axis=1))).max()))
 
-best_time = 100
+times = []
 for i in range(runs):
     start = timeit.default_timer()
     roots5 = fqs.quartic_roots(p)
     stop = timeit.default_timer()
     time = stop - start
-    best_time = min(best_time, time)
-print('fqs.quartic_roots: {:.3f} ms (best of {} runs)'.format(best_time*1_000,
-      runs))
+    times.append(time)
+print('fqs.quartic_roots: {:.4f} ms (average of {} runs)'
+      .format(np.array(times).mean()*1_000, runs))
 print('max err: {:.2e}'.format(abs(np.sort(roots5, axis=1)
                     - (np.sort(roots1, axis=1))).max()))
 # --------------------------------------------------------------------------- #
