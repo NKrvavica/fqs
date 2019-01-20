@@ -583,22 +583,22 @@ To summarize findings on computation speed of different ways to solve cubic and 
 
 * Two numerical root-solving algorithms were tested (`numpy.roots` and `numpy.linalg.eigvals`)
 * Two analytical closed-form solutions were also tested (`single_cubic/single_quartic` for a single polynomial and vectorized `mutli_cubic/multi_quartic`  for multiple polynomials). These functions are available through [FQS](https://github.com/NKrvavica/fqs).
-* If a single polynomial is being solved, `single_cubic/single_quartic` with Numba is the fastest algorithm. It is one order of magnitude faster than `numpy.roots`, `numpy.linalg.eigvals` and `multi_cubic/multi_Quartic`. Using `@jit` from `numba` increases its speed by a factor of 4.
+* If a single polynomial is being solved, `single_cubic/single_quartic` with Numba is the fastest algorithm. It is one order of magnitude faster than `numpy.roots`, `numpy.linalg.eigvals` and `multi_cubic/multi_quartic`. Using `@jit` from `numba` increases its speed by a factor of 4-13.
 * If multiple polynomials are being solved, and their number is less than ~100, `single_cubic/single_quartic` with Numba is still the fastest algorithm.
 * If more than 100 polynomials are being solved, use vectorized `multi_cubic/multi_quartic`, it is two orders of magnitude faster than `numpy.roots`, and one order of magnitude faster than `numpy.linalg.eigvals` and `single_cubic/single_quartic` with Numba.
-* A Python function containing `single_cubic` , `single_quartic`, `multi_cubic`, and `multi_quartic`, as well as a function than determines which one should be used in a specific case, is available through [FQS](https://github.com/NKrvavica/fqs).
+* A Python function containing `single_cubic` , `single_quartic`, `multi_cubic`, and `multi_quartic`, as well as a function than determines what solver should be used in a specific case, is available through [FQS](https://github.com/NKrvavica/fqs).
 
 The CPU times are summarized in the following two tables for cubic and quartic equation, respectively:
 
 |     N | `roots` | `linalg.eigvals` | `single_cubic` | `single_cubic (@jit)` | `multi_cubic` |
 | ----: | ------- | ---------------- | -------------- | --------------------- | ------------- |
 |     1 | 76.5 µs | 67 µs            | 28.6 µs        | **6.34 µs**           | 174 µs        |
-|   100 | 8.19 ms | 0.54 ms          | 2.11 ms        | 0.28 ms               | **0.23 ms**   |
+|   100 | 8.19 ms | 0.54 ms          | 2.11 ms        | **0.27 ms**           | **0.24 ms**   |
 | 10000 | 786 ms  | 31.2 ms          | 236 ms         | 27.6 ms               | **3.14 ms**   |
 
 |     N | `roots` | `linalg.eigvals` | `single_quartic` | `single_quartic (@jit)` | `multi_quartic` |
 | ----: | ------- | ---------------- | ---------------- | ----------------------- | --------------- |
 |     1 | 80.1 µs | 69.3 µs          | 50.3 µs          | **5.8 µs**              | 233 µs          |
-|   100 | 8.22 ms | 0.59 ms          | 3.94 ms          | **0.33 ms**             | 0.34 ms         |
+|   100 | 8.22 ms | 0.59 ms          | 3.94 ms          | **0.34 ms**             | **0.34 ms**     |
 | 10000 | 795 ms  | 48.3 ms          | 421 ms           | 30.8 ms                 | **5.46 ms**     |
 
