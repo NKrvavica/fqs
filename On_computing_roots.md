@@ -63,6 +63,7 @@ The respective results are:
 			-1.1475662 +0.j        ]))
 
 and
+
 	>>> p_quartic
 	array([0.30022249, 0.31473263, 0.00791689, 0.06335546, 0.73838408])
 	>>> quartic_roots
@@ -107,7 +108,7 @@ Can we speed things up, knowing that loops in Python are slower in comparison to
 
 Documentation for `numpy.roots` states that its algorithms rely on computing the eigenvalues of the _companion_ matrix. It uses the fact that the eigenvalues of a matrix `A` are the roots of its characteristic polynomial `p`. 
 
-Function `numpy.linalg.eigvals` computes eigenvalues of a general square matrix `A` using _geev_ [LAPACK](http://www.netlib.org/lapack/) routines. The main advantage of the function `linalg.eigals` over `roots` is that it uses [vectorization](https://en.wikipedia.org/wiki/Array_programming). Meaning, it runs certain operations over entire array, rather than over individual elements. Therefore, it can take as input stacked array of companion matrices, and does not require `for` loops or list comprehensions.
+Function `numpy.linalg.eigvals` computes eigenvalues of a general square matrix `A` using _geev_ [LAPACK](http://www.netlib.org/lapack/) routines. The main advantage of the function `linalg.eigvals` over `roots` is that it uses [vectorization](https://en.wikipedia.org/wiki/Array_programming). Meaning, it runs certain operations over entire array, rather than over individual elements. Therefore, it can take as input stacked array of companion matrices, and does not require `for` loops or list comprehensions.
 
 For cubic equations, first we reduce the polynomial to the form: 
 
@@ -221,7 +222,7 @@ Python function for roots of a quadratic equation is implemented as:
             x**2 + a*x + b = 0 '''
         a, b = b0 / a0, c0 / a0
     
-        # Some repating variables
+        # Some repeating variables
         a0 = -0.5*a
         delta = a0*a0 - b
         sqrt_delta = cmath.sqrt(delta)
@@ -296,7 +297,7 @@ And finally, the function for roots of a quartic equation is implemented as:
         a0 = 0.25*a
         a02 = a0*a0
     
-        # Coefficients of subsidiary cubic euqtion
+        # Coefficients of subsidiary cubic equation
         p = 3*a02 - 0.5*b
         q = a*a02 - b*a0 + 0.5*c
         r = 3*a02*a02 - b*a02 + c*a0 - d
@@ -422,10 +423,10 @@ For quadratic equation:
     	# Quadratic coefficient
         a, b = b0 / a0, c0 / a0
     
-        # Some repating variables
+        # Some repeating variables
         a0 = -0.5*a
         delta = a0*a0 - b
-        sqrt_delta = np.sqrt(delta + 0j)
+        sqrt_delta = numpy.sqrt(delta + 0j)
     
         # Roots
         r1 = a0 - sqrt_delta
@@ -459,7 +460,7 @@ For cubic equation:
         def cubic_root(x):
             ''' Compute cubic root of a number while maintaining its sign
             '''
-            root = np.zeros_like(x)
+            root = numpy.zeros_like(x)
             positive = (x >= 0)
             negative = ~positive
             root[positive] = x[positive]**third
@@ -478,12 +479,12 @@ For cubic equation:
         def roots_all_real_distinct(a13, f, g, h):
             ''' Compute cubic roots if all roots are real and distinct
             '''
-            j = np.sqrt(-f)
-            k = np.arccos(-0.5*g / (j*j*j))
-            m = np.cos(third*k)
+            j = numpy.sqrt(-f)
+            k = numpy.arccos(-0.5*g / (j*j*j))
+            m = numpy.cos(third*k)
             r1 = 2*j*m - a13
             if all_roots:
-                n = sqr3 * np.sin(third*k)
+                n = sqr3 * numpy.sin(third*k)
                 r2 = -j * (m + n) - a13
                 r3 = -j * (m - n) - a13
                 return r1, r2, r3
@@ -493,7 +494,7 @@ For cubic equation:
         def roots_one_real(a13, g, h):
             ''' Compute cubic roots if one root is real and other two are complex
             '''
-            sqrt_h = np.sqrt(h)
+            sqrt_h = numpy.sqrt(h)
             S = cubic_root(-0.5*g + sqrt_h)
             U = cubic_root(-0.5*g - sqrt_h)
             S_plus_U = S + U
@@ -508,12 +509,12 @@ For cubic equation:
     
         # Compute roots
         if all_roots:
-            roots = np.zeros((3, len(a))).astype(complex)
+            roots = numpy.zeros((3, len(a))).astype(complex)
             roots[:, m1] = roots_all_real_equal(c[m1])
             roots[:, m2] = roots_all_real_distinct(a13[m2], f[m2], g[m2], h[m2])
             roots[:, m3] = roots_one_real(a13[m3], g[m3], h[m3])
         else:
-            roots = np.zeros(len(a))
+            roots = numpy.zeros(len(a))
             roots[m1] = roots_all_real_equal(c[m1])
             roots[m2] = roots_all_real_distinct(a13[m2], f[m2], g[m2], h[m2])
             roots[m3] = roots_one_real(a13[m3], g[m3], h[m3])
@@ -531,7 +532,7 @@ And for quadratic equation:
         a0 = 0.25*a
         a02 = a0*a0
     
-        # Coefficients of subsidiary cubic euqtion
+        # Coefficients of subsidiary cubic equation
         p = 3*a02 - 0.5*b
         q = a*a02 - b*a0 + 0.5*c
         r = 3*a02*a02 - b*a02 + c*a0 - d
@@ -540,8 +541,8 @@ And for quadratic equation:
         z0 = multi_cubic(1, p, r, p*r - 0.5*q*q, all_roots=False)
     
         # Additional variables
-        s = np.sqrt(2*p + 2*z0.real + 0j)
-        t = np.zeros_like(s)
+        s = numpy.sqrt(2*p + 2*z0.real + 0j)
+        t = numpy.zeros_like(s)
         mask = (s == 0)
         t[mask] = z0[mask]*z0[mask] + r[mask]
         t[~mask] = -q[~mask] / s[~mask]
@@ -586,7 +587,7 @@ Findings on computation speed of different ways to solve cubic and quartic equat
 * Two numerical algorithms for finding polynomial roots are available out-of-box from Numpy package (`numpy.roots` and `numpy.linalg.eigvals`)
 * Analytical algorithms (closed-form solutions) for solving polynomial roots were implemented in Python (`single_cubic/single_quartic` for a single polynomial, and vectorized `multi_cubic/multi_quartic`  for multiple polynomials). These functions are available through [FQS](https://github.com/NKrvavica/fqs)
 * Both numerical algorithms have similar CPU times for a single polynomial, but for multiple polynomials `linalg.eigvals` becomes much faster (up to one order of magnitude)
-* Analytical algorithm `single_cubic/single_quartic` if the fastest when a single polynomial, or a set smaller then 100 polynomials should be solved
+* Analytical algorithm `single_cubic/single_quartic` is the fastest when a single polynomial, or a set smaller then 100 polynomials should be solved
 * For `single_cubic/single_quartic` _just-in-time_ compiler from Numba gives a significant increase in the computational speed
 * Analytical algorithm `multi_cubic/multi_quartic` is the fastest when a set larger than 100 polynomials is given as input
 * A Python function containing `single_cubic` , `single_quartic`, `multi_cubic`, and `multi_quartic`, as well as a function than determines what solver should be used in a specific case, is available through [FQS](https://github.com/NKrvavica/fqs).
